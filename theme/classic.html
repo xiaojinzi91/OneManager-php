@@ -249,7 +249,7 @@
                             </li>
 <!--AdminEnd-->
                             <ion-icon name="folder"></ion-icon>
-                            <a id="file_a<!--filenum-->" name="folderlist" href="<!--FileEncodeReplaceUrl-->/"><!--FileEncodeReplaceName--></a>
+                            <a id="file_a<!--filenum-->" name="folderlist" href="<!--FileEncodeReplaceUrl-->/" fileid="<!--FileId-->"><!--FileEncodeReplaceName--></a>
                         </td>
                         <td class="updated_at" id="folder_time<!--filenum-->"><!--lastModifiedDateTime--></td>
                         <td class="size" id="folder_size<!--filenum-->"><!--size--></td>
@@ -269,7 +269,7 @@
                             </li>
 <!--AdminEnd-->
                             <ion-icon name="<!--IconValue-->"></ion-icon>
-                            <a id="file_a<!--filenum-->" name="filelist" href="<!--FileEncodeReplaceUrl-->?preview" target=_blank><!--FileEncodeReplaceName--></a>
+                            <a id="file_a<!--filenum-->" name="filelist" href="<!--FileEncodeReplaceUrl-->?preview" fileid="<!--FileId-->" target=_blank><!--FileEncodeReplaceName--></a>
                             <a class="download" href="<!--FileEncodeReplaceUrl-->"><ion-icon name="download"></ion-icon></a>
                         </td>
                         <td class="updated_at" id="file_time<!--filenum-->"><!--lastModifiedDateTime--></td>
@@ -357,6 +357,7 @@
                 <label id="rename_label"></label><br><br><a onclick="operatediv_close('rename')" class="operatediv_close"><!--constStr@Close--></a>
                 <form id="rename_form" onsubmit="return submit_operate('rename');">
                 <input id="rename_sid" name="rename_sid" type="hidden" value="">
+                <input id="rename_fileid" name="rename_fileid" type="hidden" value="">
                 <input id="rename_hidden" name="rename_oldname" type="hidden" value="">
                 <input id="rename_input" name="rename_newname" type="text" value="">
                 <input name="operate_action" type="submit" value="<!--constStr@Rename-->">
@@ -370,6 +371,7 @@
                 <form id="delete_form" onsubmit="return submit_operate('delete');">
                 <label id="delete_input"><!--constStr@Delete-->?</label>
                 <input id="delete_sid" name="delete_sid" type="hidden" value="">
+                <input id="delete_fileid" name="delete_fileid" type="hidden" value="">
                 <input id="delete_hidden" name="delete_name" type="hidden" value="">
                 <input name="operate_action" type="submit" value="<!--constStr@Submit-->">
                 </form>
@@ -380,6 +382,7 @@
                 <label id="encrypt_label"></label><br><br><a onclick="operatediv_close('encrypt')" class="operatediv_close"><!--constStr@Close--></a>
                 <form id="encrypt_form" onsubmit="return submit_operate('encrypt');">
                 <input id="encrypt_sid" name="encrypt_sid" type="hidden" value="">
+                <input id="encrypt_fileid" name="encrypt_fileid" type="hidden" value="">
                 <input id="encrypt_hidden" name="encrypt_folder" type="hidden" value="">
                 <input id="encrypt_input" name="encrypt_newpass" type="text" value="" placeholder="<!--constStr@InputPasswordUWant-->">
                 <!--EncryptBtnStart--><input name="operate_action" type="submit" value="<!--constStr@Encrypt-->"><!--EncryptBtnEnd--><!--EncryptAlertStart--><br><label><!--constStr@SetpassfileBfEncrypt--></label><!--EncryptAlertEnd-->
@@ -391,6 +394,7 @@
                 <label id="copy_label"></label><br><br><a onclick="operatediv_close('copy')" class="operatediv_close"><!--constStr@Close--></a>
                 <form id="copy_form" onsubmit="return submit_operate('copy');">
                 <input id="copy_sid" name="copy_sid" type="hidden" value="">
+                <input id="copy_fileid" name="copy_fileid" type="hidden" value="">
                 <input id="copy_hidden" name="copy_name" type="hidden" value="">
                 <input id="copy_input" name="copy_input" type="hidden" value="">
                 <input name="operate_action" type="submit" value="<!--constStr@Copy-->">
@@ -402,6 +406,7 @@
                 <label id="move_label"></label><br><br><a onclick="operatediv_close('move')" class="operatediv_close"><!--constStr@Close--></a>
                 <form id="move_form" onsubmit="return submit_operate('move');">
                 <input id="move_sid" name="move_sid" type="hidden" value="">
+                <input id="move_fileid" name="move_fileid" type="hidden" value="">
                 <input id="move_hidden" name="move_name" type="hidden" value="">
                 <select id="move_input" name="move_folder">
 <!--MoveRootStart-->
@@ -420,6 +425,7 @@
                 <a onclick="operatediv_close('create')" class="operatediv_close"><!--constStr@Close--></a>
                 <form id="create_form" onsubmit="return submit_operate('create');">
                     <input id="create_sid" name="create_sid" type="hidden" value="">
+                    <input id="create_fileid" name="create_fileid" type="hidden" value="">
                     <input id="create_hidden" type="hidden" value="">
                     <table>
                         <tr>
@@ -1026,8 +1032,8 @@
                                 label.style.color='green';
                                 // uploadbuttonshow();
 <!--AdminStart-->
-                                response.name=file.webkitRelativePath||response.name;
-                                addelement(response);
+                                //response.name=file.webkitRelativePath||response.name;
+                                //addelement(response);
 <!--AdminEnd-->
                             } else {
                                 if (!response['nextExpectedRanges']) {
@@ -1074,16 +1080,19 @@
         document.getElementById('mask').style.height=document.documentElement.scrollHeight<window.innerHeight?window.innerHeight:document.documentElement.scrollHeight+'px';
         if (num=='') {
             var str='';
+            var fileid='';
         } else {
             var str=decodeURIComponent(document.getElementById('file_a'+num).href);
             if (str.substr(-1)==' ') str=str.substr(0, str.length-1);
             if (str.substr(-1)=='/') str=str.substr(0, str.length-1);
             if (str.substr(-8)=='?preview') str=str.substr(0, str.length-8);
             if (str.lastIndexOf('/')>-1) str=str.substr(str.lastIndexOf('/')+1);
+            var fileid=document.getElementById('file_a'+num).attributes['fileid'].nodeValue;
         }
         document.getElementById(action + '_div').style.display='';
         document.getElementById(action + '_label').innerText=str;//.replace(/&/,'&amp;');
         document.getElementById(action + '_sid').value=num;
+        document.getElementById(action + '_fileid').value=fileid;
         document.getElementById(action + '_hidden').value=str;
         if (action=='rename') document.getElementById(action + '_input').value=str;
         var $e = event || window.event;
@@ -1125,10 +1134,10 @@
                     file_a.href = (file_a.href.substr(-8)=='?preview')?(html.name.replace(/#/,'%23')+'?preview'):(html.name.replace(/#/,'%23')+'/');
                 }
                 if (str=='move'||str=='delete') document.getElementById('tr'+num).parentNode.removeChild(document.getElementById('tr'+num));
-                if (str=='create') {
-                    html=JSON.parse(xhr.responseText);
-                    addelement(html);
-                }
+                //if (str=='create') {
+                //    html=JSON.parse(xhr.responseText);
+                //    addelement(html);
+                //}
             } else alert(xhr.status+'\n'+xhr.responseText);
             document.getElementById(str+'_div').style.display='none';
             document.getElementById('mask').style.display='none';
